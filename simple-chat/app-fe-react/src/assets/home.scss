@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Lato:400,700);
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 
 $green: #86BB71;
 $blue: #94C2ED;
@@ -21,6 +21,10 @@ body {
   width: 750px;
   background: #444753;
   border-radius: 5px;
+}
+
+ul {
+  list-style: none;
 }
 
 .people-list {
@@ -49,10 +53,6 @@ body {
   ul {
     padding: 20px;
     height: 770px;
- 
-    
-    
-    
     li {
       padding-bottom: 20px;
     }

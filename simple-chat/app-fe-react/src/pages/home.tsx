@@ -1,10 +1,79 @@
 // import { makeStyles, Theme, createStyles } from '@material-ui/core'
-import Icon from '@material-ui/core/Icon'
 import '../assets/home.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee } from '@fortawesome/free-solid-svg-icons'
+import { faCircle, faStar } from '@fortawesome/free-solid-svg-icons'
+import HelloModal from './components/helloModal'
+import { useEffect, useState } from 'react'
+import io from 'socket.io-client'
+
+// eslint-disable-next-line no-undef
+let socket: SocketIOClient.Socket
 
 function Home () {
+  const [name, setName] = useState('')
+
+  const onCloseModal = (name_: string) => {
+    console.log('onCloseModal name: ', name_)
+    setName(name_)
+  }
+
+  useEffect(() => {
+    if (name !== '') {
+      initSocket()
+      console.log('useEffect socket: ', socket)
+    }
+    return () => {
+      if (socket !== null && socket !== undefined) { socket.close() }
+      console.log('cleanup')
+    }
+  }, [name])
+
+  const initSocket = () => {
+    console.log('initSocket')
+    // socket = io('http://localhost:3000/ws/simple-chat', { transports: ['websocket'] })
+    socket = io('http://localhost:3000/ws/simple-chat', { transports: ['websocket'] })
+
+    socket.on('connect', () => {
+      console.log('socket.on connect')
+      // this.actionStoreClient()
+      // this.$toast.success('접속 되었습니다.')
+    })
+    socket.on('resServerChat', (data: any) => {
+      console.log('socket.on resServerChat : ', data)
+      // this.actionsReceiveText(data)
+    })
+    socket.on('resNewUser', (data: any) => {
+      console.log('socket.on resNewUser : ', data)
+      // if (data.user !== this.myName) {
+      //   this.$toast.success('새로운 유저 등장!')
+      // }
+      // this.users = data
+    })
+    socket.on('resOutUser', (data: any) => {
+      console.log('socket.on resOutUser : ', data)
+      // if (data.user !== this.myName) {
+      //   this.$toast.success('다른 유저가 퇴장하였습니다.')
+      // }
+      // this.users = data
+    })
+    socket.on('disconnect', () => {
+      console.log('socket.on disconnect')
+      // this.$toast.success('연결이 종료 되었습니다.')
+    })
+  }
+
+  const actionTestSend = () => {
+    const content = {
+      text: 'this.message',
+      time: Date.now(),
+      image: '',
+      user: name
+    }
+    if (socket) {
+      socket.emit('reqServerChat', content)
+    }
+  }
+
   return (
     <>
       <div className="container clearfix">
@@ -15,9 +84,7 @@ function Home () {
               <div className="about">
                 <div className="name">Vincent Porter 11</div>
                 <div className="status">
-                  <FontAwesomeIcon icon={faCoffee} className="online"/>
-                  <Icon>star</Icon>
-                  <Icon className="fa fa-circle online" /> online
+                  <FontAwesomeIcon icon={faCircle} className="online"/> online
                 </div>
               </div>
             </li>
@@ -25,90 +92,9 @@ function Home () {
             <li className="clearfix">
               <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_02.jpg" alt="avatar" />
               <div className="about">
-                <Icon className="fa fa-plus-circle" />
                 <div className="name">Aiden Chavez</div>
                 <div className="status">
-                  <i className="fa fa-circle offline"></i> left 7 mins ago
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_03.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Mike Thomas</div>
-                <div className="status">
-                  <i className="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_04.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Erica Hughes</div>
-                <div className="status">
-                  <i className="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_05.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Ginger Johnston</div>
-                <div className="status">
-                  <i className="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_06.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Tracy Carpenter</div>
-                <div className="status">
-                  <i className="fa fa-circle offline"></i> left 30 mins ago
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_07.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Christian Kelly</div>
-                <div className="status">
-                  <i className="fa fa-circle offline"></i> left 10 hours ago
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_08.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Monica Ward</div>
-                <div className="status">
-                  <i className="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_09.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Dean Henry</div>
-                <div className="status">
-                  <i className="fa fa-circle offline"></i> offline since Oct 28
-                </div>
-              </div>
-            </li>
-
-            <li className="clearfix">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg" alt="avatar" />
-              <div className="about">
-                <div className="name">Peyton Mckinney</div>
-                <div className="status">
-                  <i className="fa fa-circle online"></i> online
+                  <FontAwesomeIcon icon={faCircle} className="offline"/> left 7 mins ago
                 </div>
               </div>
             </li>
@@ -121,18 +107,18 @@ function Home () {
 
             <div className="chat-about">
               <div className="chat-with">Chat with Vincent Porter</div>
-              <div className="chat-num-messages">already 1 902 messages</div>
+              <div className="chat-num-messages">already many messages</div>
             </div>
-            <i className="fa fa-star"></i>
+            <FontAwesomeIcon icon={faStar} />
           </div>
 
           <div className="chat-history">
             <ul>
-              <li className="clearfix">
+              <li className="clearfix" >
                 <div className="message-data align-right">
                   <span className="message-data-time" >10:10 AM, Today</span> &nbsp; &nbsp;
-                  <span className="message-data-name" >Olia</span> <i className="fa fa-circle me"></i>
-
+                  <span className="message-data-name" >Olia</span>&nbsp;
+                  <FontAwesomeIcon icon={faCircle} className="me"/>
                 </div>
                 <div className="message other-message float-right">
                   Hi Vincent, how are you? How is the project coming along?
@@ -141,7 +127,9 @@ function Home () {
 
               <li>
                 <div className="message-data">
-                  <span className="message-data-name"><i className="fa fa-circle online"></i> Vincent</span>
+                  <span className="message-data-name">
+                    <FontAwesomeIcon icon={faCircle} className="online"/> Vincent
+                  </span>
                   <span className="message-data-time">10:12 AM, Today</span>
                 </div>
                 <div className="message my-message">
@@ -152,8 +140,8 @@ function Home () {
               <li className="clearfix">
                 <div className="message-data align-right">
                   <span className="message-data-time" >10:14 AM, Today</span> &nbsp; &nbsp;
-                  <span className="message-data-name" >Olia</span> <i className="fa fa-circle me"></i>
-
+                  <span className="message-data-name" >Olia</span>&nbsp;
+                  <FontAwesomeIcon icon={faCircle} className="me"/>
                 </div>
                 <div className="message other-message float-right">
                   Well I am not sure. The rest of the team is not here yet. Maybe in an hour or so? Have you faced any problems at the last phase of the project?
@@ -161,23 +149,9 @@ function Home () {
               </li>
 
               <li>
-                <div className="message-data">
-                  <span className="message-data-name"><i className="fa fa-circle online"></i> Vincent</span>
-                  <span className="message-data-time">10:20 AM, Today</span>
-                </div>
-                <div className="message my-message">
-                  Actually everything was fine. Im very excited to show this to our team.
-                </div>
-              </li>
-
-              <li>
-                <div className="message-data">
-                  <span className="message-data-name"><i className="fa fa-circle online"></i> Vincent</span>
-                  <span className="message-data-time">10:31 AM, Today</span>
-                </div>
-                <i className="fa fa-circle online"></i>
-                <i className="fa fa-circle online" style={{ color: '#AED2A6' }}></i>
-                <i className="fa fa-circle online" style={{ color: '#DAE9DA' }}></i>
+                <FontAwesomeIcon icon={faCircle} className="online"/>
+                <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#AED2A6' }}/>
+                <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#DAE9DA' }}/>
               </li>
 
             </ul>
@@ -190,7 +164,8 @@ function Home () {
             <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
             <i className="fa fa-file-image-o"></i>
 
-            <button>Send</button>
+            <HelloModal openProps={true} closeProps={onCloseModal}/>
+            <button type="button" onClick={actionTestSend}>Send</button>
 
           </div>
 
