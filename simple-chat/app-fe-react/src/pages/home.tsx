@@ -3,7 +3,7 @@ import '../assets/home.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircle, faStar } from '@fortawesome/free-solid-svg-icons'
 import HelloModal from './components/helloModal'
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react'
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
 
 // eslint-disable-next-line no-undef
@@ -44,7 +44,7 @@ const tempUsers: Tusers = [
     login: 1602423163053
   },
   {
-    avatar: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_03.jpg',
+    avatar: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_09.jpg',
     name: 'Computer',
     login: 1602423163051
   }
@@ -52,23 +52,23 @@ const tempUsers: Tusers = [
 
 const tempContents: TContents = [
   {
-    text: 'Hi Vincent, how are you? How is the project coming along?',
+    text: 'Hi There, 바르고 고운말 부탁합니다.pc 라고 부르면 컴퓨터가 이야기해요. 예) pc 안녕? 이미지 보여줘',
     time: Date.now() - 300000,
     image: '',
-    user: 'Olia'
-  },
-  {
-    text: 'Are we meeting today? Project has been already finished and I have results to show you.',
-    time: Date.now() - 200000,
-    image: '',
-    user: 'Vincent'
-  },
-  {
-    text: 'Well I am not sure. The rest of the team is not here yet. Maybe in an hour or so? Have you faced any problems at the last phase of the project?',
-    time: Date.now() - 100000,
-    image: '',
-    user: 'Olia'
+    user: 'Computer-fake'
   }
+  // {
+  //   text: 'Are we meeting today? Project has been already finished and I have results to show you.',
+  //   time: Date.now() - 200000,
+  //   image: '',
+  //   user: 'Vincent'
+  // },
+  // {
+  //   text: 'Well I am not sure. The rest of the team is not here yet. Maybe in an hour or so? Have you faced any problems at the last phase of the project?',
+  //   time: Date.now() - 100000,
+  //   image: '',
+  //   user: 'Olia'
+  // }
 ]
 
 function RenderUserList ({ users } : TPropsUsetList) {
@@ -78,7 +78,7 @@ function RenderUserList ({ users } : TPropsUsetList) {
       <div className="about">
         <div className="name">{user.name}</div>
         <div className="status">
-          <FontAwesomeIcon icon={faCircle} className="online"/> online
+          <FontAwesomeIcon icon={faCircle} className="me"/> online
         </div>
       </div>
     </li>
@@ -92,15 +92,22 @@ function RenderUserList ({ users } : TPropsUsetList) {
 
 function RenderContentList ({ contents, myname } : TPropsContentList) {
   const myItem = (content: TContent) => (
-    <li className="clearfix" >
+    <li className="clearfix" key={content.time}>
       <div className="message-data">
         <span className="message-data-time" >{content.time}</span> &nbsp; &nbsp;
         <span className="message-data-name" >{content.user}</span>&nbsp;
         <FontAwesomeIcon icon={faCircle} className="me"/>
       </div>
-      <div className="message my-message">
-        {content.text}
-      </div>
+      {
+      content.text
+        ? (<div className="message my-message">{content.text}</div>)
+        : (<span></span>)
+      }
+      {
+      content.image
+        ? (<div className="message my-message"><img style={{ maxWidth: 290 }} src={content.image}/></div>)
+        : (<span></span>)
+      }
     </li>
   )
   const otherItem = (content: TContent) => (
@@ -110,22 +117,29 @@ function RenderContentList ({ contents, myname } : TPropsContentList) {
         <span className="message-data-name" >{content.user}</span>&nbsp;
         <FontAwesomeIcon icon={faCircle} className="online"/>
       </div>
-      <div className="message other-message float-right">
-        {content.text}
-      </div>
+      {
+      content.text
+        ? (<div className="message other-message float-right">{content.text}</div>)
+        : (<span></span>)
+      }
+      {
+      content.image
+        ? (<div className="message other-message float-right"><img style={{ maxWidth: 290 }} src={content.image}/></div>)
+        : (<span></span>)
+      }
     </li>
   )
   const list = contents?.map((content: TContent, index) => (
     content.user === myname ? myItem(content) : otherItem(content)
   ))
   return (
-    <ul>
+    <ul style={{ position: 'absolute', paddingRight: 10 }}>
       {list}
-      <li>
+      {/* <li>
         <FontAwesomeIcon icon={faCircle} className="online"/>
         <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#AED2A6' }}/>
         <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#DAE9DA' }}/>
-      </li>
+      </li> */}
     </ul>
   )
 }
@@ -135,6 +149,9 @@ function Home () {
   const [message, setMessage] = useState('')
   // eslint-disable-next-line no-unused-vars
   const [users, setUsers] = useState<Tusers>(tempUsers)
+  const [contents, setContents] = useState<TContents>(tempContents)
+
+  const messagesEndRef = useRef<null | HTMLDivElement>(null)
 
   const onCloseModal = (name_: string) => {
     console.log('onCloseModal name: ', name_)
@@ -152,6 +169,50 @@ function Home () {
     }
   }
 
+  const actionScrollToBottom = () => {
+    if (messagesEndRef.current) {
+      console.log('actionScrollToBottom messagesEndRef.current : ', messagesEndRef.current)
+      messagesEndRef.current.children[0].scrollIntoView({ block: 'end', behavior: 'smooth' })
+      // messagesEndRef.current.children[0].scrollIntoView({ block: 'end', behavior: 'smooth' })
+    }
+  }
+
+  const handleChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    // console.log('files : ', files)
+    if (files !== null && files?.length > 0) {
+      const reader = new FileReader()
+      reader.onloadend = function () {
+        // console.log('RESULT', reader.result)
+        const imageMsg = (reader.result)?.toString()
+        actionSendImage(imageMsg || '')
+        event.target.value = ''
+        event.target.files = null
+      }
+      reader.readAsDataURL(files[0])
+    }
+  }
+
+  const actionStoreClient = () => {
+    let randomInt = Math.floor(Math.random() * 10)
+    if (randomInt === 0) randomInt = 1
+    if (randomInt > 8) randomInt = 8
+    const avatar_ = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg'
+    socket.emit('reqStoreClient', {
+      name,
+      avatar: avatar_
+    })
+  }
+
+  const actionsReceiveText = (data: TContent) => {
+    setContents([
+      ...contents,
+      data
+    ])
+    contents.push(data)
+    actionScrollToBottom()
+  }
+
   const actionSendMessage = () => {
     if (message === null || message === undefined) {
       return
@@ -166,6 +227,25 @@ function Home () {
       text: message,
       time: Date.now(),
       image: '',
+      user: name
+    }
+    if (socket) {
+      socket.emit('reqServerChat', content)
+      setMessage('')
+    }
+  }
+
+  const actionSendImage = (image: string) => {
+    if (image === null || image === undefined) {
+      return
+    }
+    if (image === '') {
+      return
+    }
+    const content: TContent = {
+      text: '',
+      time: Date.now(),
+      image,
       user: name
     }
     if (socket) {
@@ -196,15 +276,16 @@ function Home () {
 
     socket.on('connect', () => {
       console.log('socket.on connect')
-      // this.actionStoreClient()
+      actionStoreClient()
       // this.$toast.success('접속 되었습니다.')
     })
     socket.on('resServerChat', (data: any) => {
       console.log('socket.on resServerChat : ', data)
-      // this.actionsReceiveText(data)
+      actionsReceiveText(data)
     })
     socket.on('resNewUser', (data: any) => {
       console.log('socket.on resNewUser : ', data)
+      setUsers(data)
       // if (data.user !== this.myName) {
       //   this.$toast.success('새로운 유저 등장!')
       // }
@@ -222,18 +303,6 @@ function Home () {
       // this.$toast.success('연결이 종료 되었습니다.')
     })
   }
-
-  // const renderUsers = users?.map((user: Tuser) =>
-  //   <li className="clearfix" key={user.login}>
-  //     <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg" alt="avatar" />
-  //     <div className="about">
-  //       <div className="name">Vincent Porter 11</div>
-  //       <div className="status">
-  //         <FontAwesomeIcon icon={faCircle} className="online"/> online
-  //       </div>
-  //     </div>
-  //   </li>
-  // )
 
   return (
     <>
@@ -253,8 +322,8 @@ function Home () {
             <FontAwesomeIcon icon={faStar} />
           </div>
 
-          <div className="chat-history">
-            <RenderContentList contents={tempContents} myname={name} />
+          <div className="chat-history" ref={messagesEndRef} style={{ position: 'relative' }}>
+            <RenderContentList contents={contents} myname={name} />
           </div>
 
           <div className="chat-message clearfix">
@@ -267,10 +336,8 @@ function Home () {
               onKeyUp={handleKeyUpTextarea}
               onChange={handleChangeTextarea}></textarea>
 
-            <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
-            <i className="fa fa-file-image-o"></i>
-
             <HelloModal openProps={true} closeProps={onCloseModal}/>
+            <input type="file" id="file" name="file" onChange={handleChangeFile} accept=".gif, .png, .jpg"/>
             <button type="button" onClick={actionSendMessage}>Send</button>
 
           </div>

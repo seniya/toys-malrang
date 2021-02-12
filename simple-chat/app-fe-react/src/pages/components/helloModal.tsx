@@ -41,11 +41,14 @@ type TProps = {
   closeProps: Function
 };
 
+const myName = `anyName_${(Math.random()).toFixed(4)}`
+
 export default function helloModal ({ openProps, closeProps }: TProps) {
   const classes = useStyles()
   const [open, setOpen] = useState(openProps)
   const [openSnackbar, setOpenSnackbar] = useState(false)
-  const [name, setName] = useState('anyName')
+  const [name, setName] = useState(myName)
+  // const inputEl = useRef(null)
 
   const handleClose = () => {
     if (name === null || name === '') {
@@ -69,6 +72,12 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
       handleClose()
     }
   }
+
+  // useEffect(() => {
+  //   if (inputEl.current) {
+  //     inputEl.current.focus()
+  //   }
+  // })
 
   return (
     <div>
@@ -98,11 +107,12 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
                   id="outlined-basic"
                   label="Input display-name"
                   variant="outlined"
+                  autoFocus={true}
                   value={name}
                   onChange={handleChange}
                   onKeyUp={handleKeyUp}
                 />
-                <IconButton type="button" aria-label="search" onClick={handleClose}>
+                <IconButton type="button" aria-label="submit" onClick={handleClose}>
                   <CheckIcon />
                 </IconButton>
               </div>
