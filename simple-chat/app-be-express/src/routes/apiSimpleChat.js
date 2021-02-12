@@ -1,7 +1,16 @@
+import * as faker from 'faker'
+
 class SimpleChat {
   constructor (io) {
     // this.server = server;
-    this.clients = []
+    this.clients = [
+      {
+        name: 'Computer-fake',
+        login: Date.now(),
+        avatar: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_09.jpg',
+        clientId: 'Computer-fake'
+      }
+    ]
     // this.io = require('socket.io')(server, { origins: '*:*' });
     this.io = io
     this.ioSimpleChat = this.io.of('/ws/simple-chat')
@@ -11,11 +20,6 @@ class SimpleChat {
     this.ioSimpleChat.on('connection', socket => {
       console.log('ioSimpleChat connection')
       socket.on('reqStoreClient', data => {
-        // const clientInfo = new Object()
-        // clientInfo.name = data.name
-        // clientInfo.login = Date.now()
-        // clientInfo.avatar = data.avatar
-        // clientInfo.clientId = socket.id
         const clientInfo = {
           name: data.name,
           login: Date.now(),
@@ -40,6 +44,18 @@ class SimpleChat {
       socket.on('reqServerChat', (data) => {
         console.log('reqServerChat data : ', data)
         this.ioSimpleChat.emit('resServerChat', data)
+
+        if ((data.text).indexOf('pc') === 0) {
+          const fakeContents = {
+            text: faker.lorem.sentence(),
+            time: Date.now(),
+            image: faker.image.imageUrl(),
+            user: 'Computer-fake'
+          }
+          setTimeout(() => {
+            this.ioSimpleChat.emit('resServerChat', fakeContents)
+          }, 500)
+        }
       })
     })
   }
