@@ -45,7 +45,7 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
   const classes = useStyles()
   const [open, setOpen] = useState(openProps)
   const [openSnackbar, setOpenSnackbar] = useState(false)
-  const [name, setName] = useState('')
+  const [name, setName] = useState('anyName')
 
   const handleClose = () => {
     if (name === null || name === '') {
@@ -64,7 +64,7 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
     setOpenSnackbar(false)
   }
 
-  const handleKeywordKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleClose()
     }
@@ -100,7 +100,7 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
                   variant="outlined"
                   value={name}
                   onChange={handleChange}
-                  onKeyUp={handleKeywordKeyPress}
+                  onKeyUp={handleKeyUp}
                 />
                 <IconButton type="button" aria-label="search" onClick={handleClose}>
                   <CheckIcon />
