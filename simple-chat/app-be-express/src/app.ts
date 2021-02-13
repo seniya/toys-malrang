@@ -1,13 +1,9 @@
 import * as express from 'express'
-// import * as path from 'path'
 import * as http from 'http'
 import * as morgan from 'morgan'
 
 const app = express()
-
-// const http = require('http')
 const server = http.createServer(app)
-
 const port: number = 3000
 
 app.set('port', port)
