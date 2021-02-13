@@ -298,7 +298,7 @@ function Home () {
 
   const initSocket = () => {
     console.log('initSocket')
-    socket = io('http://localhost:3000/ws/simple-chat', { transports: ['websocket'] })
+    socket = io(':8100/ws/simple-chat', { transports: ['websocket'] })
 
     socket.on('connect', () => {
       console.log('socket.on connect')

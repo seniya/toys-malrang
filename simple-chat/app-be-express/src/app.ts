@@ -1,16 +1,15 @@
 import * as express from 'express'
 import * as http from 'http'
 import * as morgan from 'morgan'
+import * as path from 'path'
 
 const app = express()
 const server = http.createServer(app)
-const port: number = 3000
+const port: number = 8100
 
 app.set('port', port)
 app.use(morgan('dev'))
-app.get('/test', (req, res) => {
-  res.send('Hello World!')
-})
+app.use(express.static(path.join(__dirname, '../../', 'app-fe-react', 'build')))
 
 /** Socket.IO 추가 : simple-chat 전용 **/
 const io = require('socket.io')(server, { origins: '*:*' })
