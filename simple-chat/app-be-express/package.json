@@ -2,9 +2,9 @@
   "name": "app-be-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "simple-chat-react.js",
   "scripts": {
-    "start": "set DEBUG=app-be-express && nodemon src/app.ts",
+    "start": "set DEBUG=app-be-express && nodemon src/simple-chat-react.ts",
     "build": "tsc -p ."
   },
   "author": "malrang",
