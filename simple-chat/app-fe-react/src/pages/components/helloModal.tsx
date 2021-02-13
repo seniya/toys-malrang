@@ -48,7 +48,6 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
   const [open, setOpen] = useState(openProps)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [name, setName] = useState(myName)
-  // const inputEl = useRef(null)
 
   const handleClose = () => {
     if (name === null || name === '') {
@@ -72,12 +71,6 @@ export default function helloModal ({ openProps, closeProps }: TProps) {
       handleClose()
     }
   }
-
-  // useEffect(() => {
-  //   if (inputEl.current) {
-  //     inputEl.current.focus()
-  //   }
-  // })
 
   return (
     <div>

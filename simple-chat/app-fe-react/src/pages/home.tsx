@@ -5,6 +5,7 @@ import { faCircle, faStar } from '@fortawesome/free-solid-svg-icons'
 import HelloModal from './components/helloModal'
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
+import { Snackbar } from '@material-ui/core'
 
 // eslint-disable-next-line no-undef
 let socket: SocketIOClient.Socket
@@ -32,6 +33,11 @@ type TPropsContentList = {
   myname: string
 }
 
+type TPropsSnackbar = {
+  open: boolean
+  messsage: string
+}
+
 const tempUsers: Tusers = [
   {
     avatar: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg',
@@ -57,19 +63,31 @@ const tempContents: TContents = [
     image: '',
     user: 'Computer-fake'
   }
-  // {
-  //   text: 'Are we meeting today? Project has been already finished and I have results to show you.',
-  //   time: Date.now() - 200000,
-  //   image: '',
-  //   user: 'Vincent'
-  // },
-  // {
-  //   text: 'Well I am not sure. The rest of the team is not here yet. Maybe in an hour or so? Have you faced any problems at the last phase of the project?',
-  //   time: Date.now() - 100000,
-  //   image: '',
-  //   user: 'Olia'
-  // }
 ]
+
+function RenderSnackbar ({ open, messsage }: TPropsSnackbar) {
+  console.log('RenderSnackbar open : ', open)
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false)
+  }
+
+  useEffect(() => {
+    // initUsers()
+    if (open) {
+      setOpenSnackbar(true)
+    }
+  }, [open])
+
+  return (
+    <Snackbar
+      open={openSnackbar}
+      autoHideDuration={3000}
+      onClose={handleCloseSnackbar}
+      message={messsage} />
+  )
+}
 
 function RenderUserList ({ users } : TPropsUsetList) {
   const list = users?.map((user: Tuser, index) => (
@@ -135,11 +153,6 @@ function RenderContentList ({ contents, myname } : TPropsContentList) {
   return (
     <ul style={{ position: 'absolute', paddingRight: 10 }}>
       {list}
-      {/* <li>
-        <FontAwesomeIcon icon={faCircle} className="online"/>
-        <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#AED2A6' }}/>
-        <FontAwesomeIcon icon={faCircle} className="online" style={{ color: '#DAE9DA' }}/>
-      </li> */}
     </ul>
   )
 }
@@ -147,9 +160,10 @@ function RenderContentList ({ contents, myname } : TPropsContentList) {
 function Home () {
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
-  // eslint-disable-next-line no-unused-vars
   const [users, setUsers] = useState<Tusers>(tempUsers)
   const [contents, setContents] = useState<TContents>(tempContents)
+  const [open, setOpen] = useState(false)
+  const [info, setInfo] = useState('')
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null)
 
@@ -235,6 +249,22 @@ function Home () {
     }
   }
 
+  const openSnackbar = (info: string) => {
+    setInfo(info)
+    setOpen(true)
+    setOpen(false)
+  }
+
+  const actionResNewUser = (data: Tusers) => {
+    setUsers(data)
+    openSnackbar('새로운 유저 등장!')
+  }
+
+  const actionResOutUser = (data: Tusers) => {
+    setUsers(data)
+    openSnackbar('다른 유저가 퇴장하였습니다.')
+  }
+
   const actionSendImage = (image: string) => {
     if (image === null || image === undefined) {
       return
@@ -266,10 +296,6 @@ function Home () {
     }
   }, [name])
 
-  // const initUsers = () => {
-  //   setUsers(tempUsers)
-  //   console.log('users : ', users)
-  // }
   const initSocket = () => {
     console.log('initSocket')
     socket = io('http://localhost:3000/ws/simple-chat', { transports: ['websocket'] })
@@ -277,35 +303,27 @@ function Home () {
     socket.on('connect', () => {
       console.log('socket.on connect')
       actionStoreClient()
-      // this.$toast.success('접속 되었습니다.')
     })
-    socket.on('resServerChat', (data: any) => {
+    socket.on('resServerChat', (data: TContent) => {
       console.log('socket.on resServerChat : ', data)
       actionsReceiveText(data)
     })
-    socket.on('resNewUser', (data: any) => {
+    socket.on('resNewUser', (data: Tusers) => {
       console.log('socket.on resNewUser : ', data)
-      setUsers(data)
-      // if (data.user !== this.myName) {
-      //   this.$toast.success('새로운 유저 등장!')
-      // }
-      // this.users = data
+      actionResNewUser(data)
     })
-    socket.on('resOutUser', (data: any) => {
+    socket.on('resOutUser', (data: Tusers) => {
       console.log('socket.on resOutUser : ', data)
-      // if (data.user !== this.myName) {
-      //   this.$toast.success('다른 유저가 퇴장하였습니다.')
-      // }
-      // this.users = data
+      actionResOutUser(data)
     })
     socket.on('disconnect', () => {
       console.log('socket.on disconnect')
-      // this.$toast.success('연결이 종료 되었습니다.')
     })
   }
 
   return (
     <>
+      <RenderSnackbar open={open} messsage={info} />
       <div className="container clearfix">
         <div className="people-list" id="people-list">
           <RenderUserList users={users}/>
@@ -339,13 +357,10 @@ function Home () {
             <HelloModal openProps={true} closeProps={onCloseModal}/>
             <input type="file" id="file" name="file" onChange={handleChangeFile} accept=".gif, .png, .jpg"/>
             <button type="button" onClick={actionSendMessage}>Send</button>
-
           </div>
 
         </div>
-
       </div>
-
     </>
   )
 }
