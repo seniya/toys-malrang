@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vuedx-typecheck . && vite build",
-    "build2": "vite build",
+    "build": "vite build",
+    "build2": "vuedx-typecheck . && vite build",
     "serve": "vite preview"
   },
   "dependencies": {
