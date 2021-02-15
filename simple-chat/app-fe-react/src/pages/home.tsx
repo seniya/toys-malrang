@@ -1,11 +1,10 @@
-// import { makeStyles, Theme, createStyles } from '@material-ui/core'
 import '../assets/home.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircle, faStar } from '@fortawesome/free-solid-svg-icons'
 import HelloModal from './components/helloModal'
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
-import io from 'socket.io-client'
 import { Snackbar } from '@material-ui/core'
+import io from 'socket.io-client'
 
 // eslint-disable-next-line no-undef
 let socket: SocketIOClient.Socket
@@ -219,11 +218,10 @@ function Home () {
   }
 
   const actionsReceiveText = (data: TContent) => {
-    setContents([
-      ...contents,
-      data
-    ])
-    contents.push(data)
+    // const newContens = [...contents, data]
+    // console.log('newContens : ', newContens)
+    // setContents(newContens)
+    setContents(contents => [...contents, data])
     actionScrollToBottom()
   }
 
