@@ -7,8 +7,6 @@ function Home () {
 
       <canvas id="canvas"></canvas>
 
-      <a className="twitter" href="https://twitter.com/lewitje">@Lewitje</a>
-
       <nav className="tools-bar">
       <div className="button button-clear" data-clear></div>
       </nav>
