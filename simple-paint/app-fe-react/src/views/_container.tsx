@@ -36,7 +36,7 @@ function MainContainer () {
       </main>
       <footer >
         <Typography variant="caption" align="right" gutterBottom>
-          <p>출처 1: https://dribbble.com/shots/1818748-Appon-Chat-Widget / 출처 2: https://codepen.io/drehimself/pen/KdXwxR</p>
+          <p>출처 1: https://dribbble.com/shots/1818748-Appon-Chat-Widget / 출처 2: https://codepen.io/drehimself/pen/KdXwxR / 출처 3 : https://konvajs.org/docs/react/Free_Drawing.html</p>
         </Typography>
       </footer>
     </>
