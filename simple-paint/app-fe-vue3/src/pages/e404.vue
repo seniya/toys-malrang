@@ -1,16 +1,16 @@
 <template>
-  <router-view></router-view>
+  <div>
+    e404
+  </div>
 </template>
 
 <script lang="ts">
-import './assets/home.scss'
-import './assets/material.scss'
 import { defineComponent } from 'vue'
-
 export default defineComponent({
-  name: 'App'
+  name: 'e404'
 })
 </script>
 
 <style>
+
 </style>
